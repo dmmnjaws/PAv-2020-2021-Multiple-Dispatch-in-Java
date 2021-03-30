@@ -1,8 +1,7 @@
 package ist.meic.pava;
 
-import ist.meic.pava.MultipleDispatch.UsingDoubleDispatch;
 import ist.meic.pava.MultipleDispatch.UsingMultipleDispatch;
-import ist.meic.pava.example.complex.*;
+import ist.meic.pava.example.triple.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

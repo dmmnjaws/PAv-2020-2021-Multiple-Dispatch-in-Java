@@ -1,4 +1,4 @@
-package ist.meic.pava.example.complex;
+package ist.meic.pava.example.triple;
 
 public class Screen extends Device {
     public void draw(Line l, Brush b) {

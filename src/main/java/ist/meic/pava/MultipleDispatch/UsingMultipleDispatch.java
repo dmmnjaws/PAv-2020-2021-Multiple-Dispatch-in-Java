@@ -46,7 +46,7 @@ public class UsingMultipleDispatch {
     private static Method bestMethod(Class receiverType, String name, Class[] parameterTypes) throws NoSuchMethodException {
 
         int orderOfDispatch = parameterTypes.length;
-        Method[] allReceiverMethods = Stream.of(receiverType.getDeclaredMethods()).filter(m -> m.getName() == name).toArray(Method[]::new);
+        Method[] allReceiverMethods = Stream.of(receiverType.getMethods()).filter(m -> m.getName() == name && m.getParameterTypes().length == orderOfDispatch).toArray(Method[]::new);
 
         for (int i = 0; i < orderOfDispatch; i++){
             allReceiverMethods = filterMethods(allReceiverMethods, parameterTypes[i], i);

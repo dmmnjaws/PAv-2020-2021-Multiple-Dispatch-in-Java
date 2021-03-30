@@ -1,4 +1,4 @@
-package ist.meic.pava.example.complex;
+package ist.meic.pava.example.quadruplus;
 
 public class Printer extends Device {
     public void draw(Line l, Brush b) {
