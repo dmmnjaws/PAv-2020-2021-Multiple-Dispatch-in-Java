@@ -3,6 +3,7 @@ package ist.meic.pava.MultipleDispatch;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 /**
@@ -23,21 +24,35 @@ public class UsingMultipleDispatch {
         }
     }
 
-    private static Stream<Method> filterMethods(Stream<Method> methods, Class parameterType, int parameterIndex){
-        Stream<Method> filteredMethods = methods.filter(m -> m.getParameterTypes()[parameterIndex] == parameterType);
+    private static Method[] filterMethods(Method[] methods, Class parameterType, int parameterIndex) throws NoSuchMethodException {
+
+        Method[] filteredMethods =
+                Arrays.stream(methods).filter(m -> m.getParameterTypes()[parameterIndex] == parameterType).toArray(Method[]::new);
+        try {
+            if (filteredMethods.length == 0){
+                throw new NoSuchMethodException();
+            }else{
+                return filteredMethods;
+            }
+        } catch (NoSuchMethodException e) {
+            if(parameterType == Object.class) {
+                throw e;
+            } else {
+                return filterMethods(methods, parameterType.getSuperclass(), parameterIndex);
+            }
+        }
     }
 
-    private static Method bestMethod(Class receiverType, String name, Stream<Class> parameterTypes) throws NoSuchMethodException {
+    private static Method bestMethod(Class receiverType, String name, Class[] parameterTypes) throws NoSuchMethodException {
 
-        int orderOfDispatch = (int)(parameterTypes.count());
-        Stream<Method> allReceiverMethods = Stream.of(receiverType.getDeclaredMethods()).filter(m -> m.getName() == name);
-        Class[] parameterTypesArray = parameterTypes.toArray(Class[]::new);
+        int orderOfDispatch = parameterTypes.length;
+        Method[] allReceiverMethods = Stream.of(receiverType.getDeclaredMethods()).filter(m -> m.getName() == name).toArray(Method[]::new);
 
         return null;
 
     }
 
-    private static Stream<Class> getParameterTypes(Stream<Object> parameters){
-        return parameters.map(object -> object.getClass());
+    private static Class[] getParameterTypes(Stream<Object> parameters){
+        return parameters.map(object -> object.getClass()).toArray(Class[]::new);
     }
 }
