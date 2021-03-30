@@ -6,7 +6,7 @@ This project is an attempt to implement multiple dispatch in Java.
 ## EXTENSIONS:
 - **Dealing not only with the class hierarchy but also the interface hierarchy.**
 
-"Dealing with class hierarchy" means bestMethod() recursively calls itself with the argument's superclass until it finds the best method. So for instance, if we go further and add a CurvedLine.class that inherits Line.class and we add the relevant methods to print it, and calling invoking them using the dispatch class, the bestMethod() would iterate over the draw method using Shape, then using Line and then using CurvedLine as argument. We need to make this possible for interfaces also. 
+"Dealing with class hierarchy" means bestMethod() recursively calls itself with the argument's superclass, starting with the most specified class, until it finds the best method. So for instance, if we go further and add a CurvedLine.class that inherits Line.class and we add the relevant methods to print it, and calling invoking them using the dispatch class, the bestMethod() would iterate over the draw method using Shape, then using Line and then using CurvedLine as argument. We need to make this possible for interfaces also. 
 
 - **Dealing with boxing and unboxing of arguments.**
 
