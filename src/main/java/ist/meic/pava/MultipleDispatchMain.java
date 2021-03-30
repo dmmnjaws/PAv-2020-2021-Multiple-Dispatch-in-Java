@@ -1,7 +1,8 @@
 package ist.meic.pava;
 
 import ist.meic.pava.MultipleDispatch.UsingDoubleDispatch;
-import ist.meic.pava.example.basic.*;
+import ist.meic.pava.MultipleDispatch.UsingMultipleDispatch;
+import ist.meic.pava.example.complex.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -13,10 +14,12 @@ public class MultipleDispatchMain {
 
         Device[] devices = new Device[] { new Screen(), new Printer() };
         Shape[] shapes = new Shape[] { new Line(), new Circle() };
+        Brush[] brushes = new Brush[] { new Pencil(), new Crayon() };
         for (Device device : devices) {
             for (Shape shape : shapes) {
-                //device.draw(shape);
-                UsingDoubleDispatch.invoke(device, "draw", shape);
+                for (Brush brush : brushes) {
+                    UsingMultipleDispatch.invoke(device, "draw", shape, brush);
+                }
             }
         }
     }

@@ -48,7 +48,11 @@ public class UsingMultipleDispatch {
         int orderOfDispatch = parameterTypes.length;
         Method[] allReceiverMethods = Stream.of(receiverType.getDeclaredMethods()).filter(m -> m.getName() == name).toArray(Method[]::new);
 
-        return null;
+        for (int i = 0; i < orderOfDispatch; i++){
+            allReceiverMethods = filterMethods(allReceiverMethods, parameterTypes[i], i);
+        }
+
+        return allReceiverMethods[0];
 
     }
 
