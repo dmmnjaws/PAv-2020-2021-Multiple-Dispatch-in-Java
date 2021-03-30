@@ -57,7 +57,8 @@ The variable arity of methods relates to the number of arguments a method needs 
 - included sample double dispatch invokation class
 
 **30 - 03 - 2021**
-- multiple dispatch is fully implemented (tested for up to quadruple dispatch)
+- multiple dispatch is fully implemented (tested for up to quadruple dispatch - NIGHTMARE!)
+- multiple dispatch algorithm explained in README.md in preparation for presentation
 
 ---
 ## USEFUL LINKS:
