@@ -1,9 +1,8 @@
 package ist.meic.pava.MultipleDispatch;
 
-import javafx.util.Pair;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.stream.Stream;
 
 /**
@@ -24,14 +23,17 @@ public class UsingMultipleDispatch {
         }
     }
 
+    private static Stream<Method> filterMethods(Stream<Method> methods, Class parameterType, int parameterIndex){
+        Stream<Method> filteredMethods = methods.filter(m -> m.getParameterTypes()[parameterIndex] == parameterType);
+    }
+
     private static Method bestMethod(Class receiverType, String name, Stream<Class> parameterTypes) throws NoSuchMethodException {
 
-        long orderOfDispatch = parameterTypes.count();
-
+        int orderOfDispatch = (int)(parameterTypes.count());
         Stream<Method> allReceiverMethods = Stream.of(receiverType.getDeclaredMethods()).filter(m -> m.getName() == name);
-
         Class[] parameterTypesArray = parameterTypes.toArray(Class[]::new);
 
+        return null;
 
     }
 
