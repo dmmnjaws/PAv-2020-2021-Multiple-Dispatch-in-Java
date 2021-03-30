@@ -1,7 +1,7 @@
 package ist.meic.pava;
 
 import ist.meic.pava.MultipleDispatch.UsingMultipleDispatch;
-import ist.meic.pava.example.triple.*;
+import ist.meic.pava.example.quadruplus.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -14,10 +14,13 @@ public class MultipleDispatchMain {
         Device[] devices = new Device[] { new Screen(), new Printer() };
         Shape[] shapes = new Shape[] { new Line(), new Circle() };
         Brush[] brushes = new Brush[] { new Pencil(), new Crayon() };
+        StrokeWidth[] strokeWidths = new StrokeWidth[] { new Thin(), new Fat() };
         for (Device device : devices) {
             for (Shape shape : shapes) {
                 for (Brush brush : brushes) {
-                    UsingMultipleDispatch.invoke(device, "draw", shape, brush);
+                    for (StrokeWidth strokeWidth : strokeWidths){
+                        UsingMultipleDispatch.invoke(device, "draw", shape, brush, strokeWidth);
+                    }
                 }
             }
         }

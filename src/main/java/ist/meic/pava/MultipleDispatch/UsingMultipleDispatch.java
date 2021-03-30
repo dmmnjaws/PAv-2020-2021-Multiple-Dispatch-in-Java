@@ -26,8 +26,10 @@ public class UsingMultipleDispatch {
 
     private static Method[] filterMethods(Method[] methods, Class parameterType, int parameterIndex) throws NoSuchMethodException {
 
-        Method[] filteredMethods =
-                Arrays.stream(methods).filter(m -> m.getParameterTypes()[parameterIndex] == parameterType).toArray(Method[]::new);
+        Method[] filteredMethods = Arrays.stream(methods)
+                .filter(m -> m.getParameterTypes()[parameterIndex] == parameterType)
+                .toArray(Method[]::new);
+
         try {
             if (filteredMethods.length == 0){
                 throw new NoSuchMethodException();
@@ -43,20 +45,28 @@ public class UsingMultipleDispatch {
         }
     }
 
-    private static Method bestMethod(Class receiverType, String name, Class[] parameterTypes) throws NoSuchMethodException {
+    private static Method bestMethod(Class receiverType, String methodName, Class[] parameterTypes) throws NoSuchMethodException {
 
         int orderOfDispatch = parameterTypes.length;
-        Method[] allReceiverMethods = Stream.of(receiverType.getMethods()).filter(m -> m.getName() == name && m.getParameterTypes().length == orderOfDispatch).toArray(Method[]::new);
+        Method[] acceptableReceiverMethods = getAcceptableReceiverMethods(receiverType, methodName, orderOfDispatch);
 
         for (int i = 0; i < orderOfDispatch; i++){
-            allReceiverMethods = filterMethods(allReceiverMethods, parameterTypes[i], i);
+            acceptableReceiverMethods = filterMethods(acceptableReceiverMethods, parameterTypes[i], i);
         }
 
-        return allReceiverMethods[0];
+        return acceptableReceiverMethods[0];
 
     }
 
     private static Class[] getParameterTypes(Stream<Object> parameters){
-        return parameters.map(object -> object.getClass()).toArray(Class[]::new);
+        return parameters
+                .map(object -> object.getClass())
+                .toArray(Class[]::new);
+    }
+
+    private static Method[] getAcceptableReceiverMethods(Class receiverType, String methodName, int orderOfDispatch) {
+        return Stream.of(receiverType.getMethods())
+                .filter(m -> m.getName() == methodName && m.getParameterTypes().length == orderOfDispatch)
+                .toArray(Method[]::new);
     }
 }
