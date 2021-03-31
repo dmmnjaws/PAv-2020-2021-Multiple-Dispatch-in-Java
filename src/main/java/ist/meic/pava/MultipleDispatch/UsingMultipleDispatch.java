@@ -23,6 +23,19 @@ public class UsingMultipleDispatch {
         }
     }
 
+    private static Method bestMethod(Class receiverType, String methodName, Class[] parameterTypes) throws NoSuchMethodException {
+
+        int orderOfDispatch = parameterTypes.length;
+        Method[] acceptableReceiverMethods = getAcceptableReceiverMethods(receiverType, methodName, orderOfDispatch);
+
+        for (int i = 0; i < orderOfDispatch; i++){
+            acceptableReceiverMethods = filterMethods(acceptableReceiverMethods, parameterTypes[i], i);
+        }
+
+        return acceptableReceiverMethods[0];
+
+    }
+
     private static Method[] filterMethods(Method[] methods, Class parameterType, int parameterIndex) throws NoSuchMethodException {
 
         Method[] filteredMethods = Arrays.stream(methods)
@@ -42,19 +55,6 @@ public class UsingMultipleDispatch {
                 return filterMethods(methods, parameterType.getSuperclass(), parameterIndex);
             }
         }
-    }
-
-    private static Method bestMethod(Class receiverType, String methodName, Class[] parameterTypes) throws NoSuchMethodException {
-
-        int orderOfDispatch = parameterTypes.length;
-        Method[] acceptableReceiverMethods = getAcceptableReceiverMethods(receiverType, methodName, orderOfDispatch);
-
-        for (int i = 0; i < orderOfDispatch; i++){
-            acceptableReceiverMethods = filterMethods(acceptableReceiverMethods, parameterTypes[i], i);
-        }
-
-        return acceptableReceiverMethods[0];
-
     }
 
     private static Class[] getParameterTypes(Stream<Object> parameters){

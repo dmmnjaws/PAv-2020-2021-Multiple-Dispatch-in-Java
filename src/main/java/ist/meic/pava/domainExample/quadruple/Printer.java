@@ -2,7 +2,7 @@ package ist.meic.pava.domainExample.quadruple;
 
 public class Printer extends Device {
 
-    // TESTING DOUPLE DISPATCH
+    // TESTING DOUBLE DISPATCH
 
     public void draw(Shape s) {
         System.err.println("draw what, in printer?");
