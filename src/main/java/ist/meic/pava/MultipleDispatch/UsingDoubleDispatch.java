@@ -4,7 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * This class was imported straight from the theoretical class of PAv for study.
+ * This class was imported straight from the theoretical class of PAv for study. Main concept here is basic Dynamic
+ * Invocation
  */
 public class UsingDoubleDispatch {
 
