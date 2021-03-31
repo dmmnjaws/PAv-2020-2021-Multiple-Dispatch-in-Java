@@ -1,4 +1,4 @@
-package ist.meic.pava.MultipleDispatch;
+package ist.meic.pava.MultipleDispatchExtended;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -6,10 +6,11 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 /**
- * This class attempts to implement multiple dispatch in Java.
+ * This class is an extention of ist.meic.pava.MultipleDispatch.UsingMultipleDispatch.class and
+ * implements
  *
  */
-public class UsingMultipleDispatch {
+public class UsingMultipleDispatchExtended {
 
     public static Object invoke(Object receiver, String methodName, Object... varArgs){
 
@@ -69,3 +70,4 @@ public class UsingMultipleDispatch {
                 .toArray(Method[]::new);
     }
 }
+
