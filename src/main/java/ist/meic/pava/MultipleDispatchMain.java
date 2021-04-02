@@ -1,6 +1,9 @@
 package ist.meic.pava;
 
 import ist.meic.pava.MultipleDispatch.UsingMultipleDispatch;
+import ist.meic.pava.MultipleDispatchExtended.UsingMultipleDispatchExtended;
+import ist.meic.pava.domainExample.extensions.BoxingUnboxing;
+import ist.meic.pava.domainExample.extensions.VariableArity;
 import ist.meic.pava.domainExample.quadruple.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,6 +25,13 @@ public class MultipleDispatchMain {
                 case "quadruple":
                     quadrupleDispatchTest();
                     break;
+                case "boxunbox":
+                    boxingUnboxingTest();
+                    break;
+                case "variablearity":
+                    variableArityTest();
+                    break;
+
                 default:
                     defaultDispatchTest();
             }
@@ -40,7 +50,7 @@ public class MultipleDispatchMain {
         for (Device device : devices) {
             for (Shape shape : shapes) {
                 //device.draw(shape); //without dynamic invocation
-                UsingMultipleDispatch.invoke(device, "draw",shape); //with dynamic invocation
+                UsingMultipleDispatch.invoke(device, "draw",shape);
             }
         }
     }
@@ -106,5 +116,48 @@ public class MultipleDispatchMain {
                 }
             }
         }
+    }
+
+    /**
+     * Invokes UsingMultipleDispatchExtended.invoke() in a Boxing/Unboxing scenario.
+     */
+    private static void boxingUnboxingTest(){
+        BoxingUnboxing foo = new BoxingUnboxing();
+        foo.bar(1);
+        foo.bar(Integer.valueOf(1));
+        UsingMultipleDispatchExtended.invoke(new BoxingUnboxing(), "bar", 1);
+        UsingMultipleDispatchExtended.invoke(new BoxingUnboxing(), "bar", Integer.valueOf(1));
+    }
+
+    /**
+     * Invokes UsingMultipleDispatchExtended.invoke() in a scenario with Variable Arity methods.
+     */
+    private static void variableArityTest(){
+        VariableArity foo = new VariableArity();
+
+        //System.err.println("Giving: Integer, Long, Float, String");
+        //foo.poing(Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), "Poing");
+        //UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), "Poing");
+
+        System.err.println("Giving: Integer, Long, Float, Double");
+        foo.poing(Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1));
+        UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1));
+
+        //System.err.println("Giving: Integer, Long");
+        //foo.poing(Integer.valueOf(1), Long.valueOf(1));
+        //UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1));
+
+        //System.err.println("Giving: Object[]");
+        //foo.poing(new Object[]{1,2,3});
+        //UsingMultipleDispatchExtended.invoke(foo, "poing", new Object[] {1,2,3});
+
+        //System.err.println("Giving: int, int, int");
+        //foo.poing(1,2,3);
+        //UsingMultipleDispatchExtended.invoke(foo, "poing", 1, 2, 3);
+
+        System.err.println("Giving: Object[] to poingWithArray");
+        foo.poingWithArray(new Object[] {1,2,3});
+        UsingMultipleDispatchExtended.invoke(foo, "poingWithArray", new Object[] {1,2,3});
+
     }
 }

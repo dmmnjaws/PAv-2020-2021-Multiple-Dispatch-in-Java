@@ -58,14 +58,16 @@ public class UsingMultipleDispatch {
     }
 
     private static Class[] getParameterTypes(Stream<Object> parameters){
+
         return parameters
                 .map(object -> object.getClass())
                 .toArray(Class[]::new);
     }
 
     private static Method[] getAcceptableReceiverMethods(Class receiverType, String methodName, int orderOfDispatch) {
+
         return Stream.of(receiverType.getMethods())
-                .filter(m -> m.getName() == methodName && m.getParameterTypes().length == orderOfDispatch)
+                .filter(m -> m.getName() == methodName && m.getParameterCount() == orderOfDispatch)
                 .toArray(Method[]::new);
     }
 }

@@ -137,6 +137,4 @@ public class Device {
     public void draw(Circle c1, Crayon c2, Fat f) {
         System.err.println("draw a circle, where, with a crayon, with fat stroke?");
     }
-
-
 }
