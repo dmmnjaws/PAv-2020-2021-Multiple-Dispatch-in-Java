@@ -22,6 +22,14 @@ public class VariableArity {
         System.err.println("poing with Number and VariableArity options");
     }
 
+    //public void poing(Number n, Integer i, Object... options){
+    //    System.err.println("poing with Number, Integer and VariableArity options");
+    //}
+
+    public void poing(Integer i, Number n, Object... options){
+        System.err.println("poing with Integer, Number and VariableArity options");
+    }
+
     public void poing(Integer i, Long l, Object... options){
         System.err.println("poing with Integer, Long and VariableArity options");
     }
@@ -37,6 +45,7 @@ public class VariableArity {
     public void poing(Shape s, Brush b, StrokeWidth sw, Object... options){
         System.err.println("poing with a Shape, Brush, StrokeWidth and VariableArity (you sure visited another package, uh!?)");
     }
+
     /**
      * This one our MultipleDispatchExtended doesn't support,
      * because it can't distinguish between Options[] and the Options... varArgs array,

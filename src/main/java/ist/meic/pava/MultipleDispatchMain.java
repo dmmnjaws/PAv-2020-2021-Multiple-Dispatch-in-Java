@@ -135,41 +135,43 @@ public class MultipleDispatchMain {
     private static void variableArityTest(){
         VariableArity foo = new VariableArity();
 
-        //System.err.println("Giving: Integer, Long, Float, String");
-        //foo.poing(Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), "Poing");
-        //UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), "Poing");
+        System.err.println("Giving: Integer, Long, Float, String");
+        foo.poing(Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), "Poing");
+        UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), "Poing");
 
-        //System.err.println("Giving: Integer, Long, Float, Double, String");
-        //foo.poing(Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1), "ola");
-        //UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1), "ola");
+        System.err.println("Giving: Integer, Long, Float, Double, String");
+        foo.poing(Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1), "ola");
+        UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1), "ola");
 
-        //System.err.println("Giving: Integer, Long");
-        //foo.poing(Integer.valueOf(1), Long.valueOf(1));
-        //UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1));
+        System.err.println("Giving: Integer, Long");
+        foo.poing(Integer.valueOf(1), Long.valueOf(1));
+        UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1));
 
-        //System.err.println("Giving: Long");
-        //foo.poing(Long.valueOf(1));
-        //UsingMultipleDispatchExtended.invoke(foo, "poing", Long.valueOf(1));
+        System.err.println("Giving: Long");
+        foo.poing(Long.valueOf(1));
+        UsingMultipleDispatchExtended.invoke(foo, "poing", Long.valueOf(1));
 
-        //System.err.println("Giving: String");
-        //foo.poing("ola");
-        //UsingMultipleDispatchExtended.invoke(foo, "poing", "ola");
+        System.err.println("Giving: String");
+        foo.poing("ola");
+        UsingMultipleDispatchExtended.invoke(foo, "poing", "ola");
 
-        //System.err.println("Giving: Line, Pencil, Fat, String, Integer");
-        //foo.poing(new Line(), new Pencil(), new Fat(), "ola", Integer.valueOf(1));
-        //UsingMultipleDispatchExtended.invoke(foo, "poing", new Line(), new Pencil(), new Fat(), "ola", Integer.valueOf(1));
+        System.err.println("Giving: Line, Pencil, Fat, String, Integer");
+        foo.poing(new Line(), new Pencil(), new Fat(), "ola", Integer.valueOf(1));
+        UsingMultipleDispatchExtended.invoke(foo, "poing", new Line(), new Pencil(), new Fat(), "ola", Integer.valueOf(1));
 
-        //System.err.println("Giving: Object[]");
-        //foo.poing(new Object[]{1,2,3});
-        //UsingMultipleDispatchExtended.invoke(foo, "poing", new Object[] {1,2,3});
+        System.err.println("Giving: Object[] (In this case, our Multiple Dispatch chooses a different method than Java does, but it's a tradeoff. We don't allow primitive arrays in our Multiple Dispatch)");
+        foo.poing(new Object[]{1,2,3});
+        UsingMultipleDispatchExtended.invoke(foo, "poing", new Object[] {1,2,3});
 
         System.err.println("Giving: int, int, int");
         foo.poing(1,2,3);
         UsingMultipleDispatchExtended.invoke(foo, "poing", 1, 2, 3);
 
-        //System.err.println("Giving: Object[] to poingWithArray");
-        //foo.poingWithArray(new Object[] {1,2,3});
-        //UsingMultipleDispatchExtended.invoke(foo, "poingWithArray", new Object[] {1,2,3});
+/*
+        System.err.println("Giving: Object[] to poingWithArray");
+        foo.poingWithArray(new Object[] {1,2,3});
+        UsingMultipleDispatchExtended.invoke(foo, "poingWithArray", new Object[] {1,2,3});
+*/
 
     }
 }

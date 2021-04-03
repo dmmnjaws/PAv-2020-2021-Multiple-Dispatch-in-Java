@@ -90,47 +90,65 @@ public class UsingMultipleDispatchExtended {
                 .toArray(Method[]::new);
 
         for (int i = 0; i < orderOfDispatch; i++) {
-            acceptableReceiverMethods = filterVariableArityMethods(acceptableReceiverMethods, parameterTypes[i], i);
+            acceptableReceiverMethods = filterVariableArityMethodsI(acceptableReceiverMethods, parameterTypes[i], i);
+        }
+
+        for (int i = 0; i < orderOfDispatch; i++) {
+            acceptableReceiverMethods = filterVariableArityMethodsII(acceptableReceiverMethods, parameterTypes[i], i);
+        }
+
+        if(acceptableReceiverMethods.length == 0){
+            throw new NoSuchMethodException();
         }
 
         Comparator<Method> byParameterCount = Comparator.comparingInt(Method::getParameterCount);
         return Arrays.stream(acceptableReceiverMethods).max(byParameterCount).get();
     }
 
-    private static Method[] filterVariableArityMethods(Method[] methods, Class parameterType, int parameterIndex) throws NoSuchMethodException {
+    private static Method[] filterVariableArityMethodsI(Method[] methods, Class parameterType, int parameterIndex) {
 
-        boolean needClimbClassHierarchy;
+        ArrayList<Method> filteredMethodsMutable = new ArrayList<>();
 
-        Method[] sameParameterTypeMethods = Arrays.stream(methods)
-                .filter(m -> m.getParameterCount() >= parameterIndex+1 && m.getParameterTypes()[parameterIndex] == parameterType)
-                .toArray(Method[]::new);
-
-        needClimbClassHierarchy = (sameParameterTypeMethods.length == 0);
+        while(parameterType != Object.class){
+            Class finalParameterType = parameterType;
+            Method[] sameParameterTypeMethods = Arrays.stream(methods)
+                    .filter(m -> m.getParameterCount() >= parameterIndex+1 && m.getParameterTypes()[parameterIndex] == finalParameterType)
+                    .toArray(Method[]::new);
+            Collections.addAll(filteredMethodsMutable, sameParameterTypeMethods);
+            parameterType = parameterType.getSuperclass();
+        }
 
         Method[] variableArityMethods = Arrays.stream(methods)
                 .filter(m -> m.getParameterCount() <= parameterIndex + 1)
                 .toArray(Method[]::new);
 
-        ArrayList<Method> filteredMethodsMutable = new ArrayList<>();
-        Collections.addAll(filteredMethodsMutable, sameParameterTypeMethods);
         Collections.addAll(filteredMethodsMutable, variableArityMethods);
-        Method[] filteredMethods = filteredMethodsMutable.toArray(new Method[0]);
 
-        try {
-            if (needClimbClassHierarchy) {
-                throw new NoSuchMethodException();
-            } else {
-                return filteredMethods;
-            }
-        } catch (NoSuchMethodException e) {
-            if (parameterType == Object.class) {
-                if (variableArityMethods.length != 0){
-                    return variableArityMethods;}
-                throw e;
-            } else {
-                return filterVariableArityMethods(methods, parameterType.getSuperclass(), parameterIndex);
-            }
+        return filteredMethodsMutable.toArray(new Method[0]);
+
+    }
+
+    private static Method[] filterVariableArityMethodsII(Method[] methods, Class parameterType, int parameterIndex) throws NoSuchMethodException {
+
+        ArrayList<Method> filteredMethodsMutable = new ArrayList<>();
+
+        while(filteredMethodsMutable.isEmpty() && parameterType != Object.class){
+            Class finalParameterType = parameterType;
+            Method[] sameParameterTypeMethods = Arrays.stream(methods)
+                    .filter(m -> m.getParameterCount() >= parameterIndex+1 && m.getParameterTypes()[parameterIndex] == finalParameterType)
+                    .toArray(Method[]::new);
+            Collections.addAll(filteredMethodsMutable, sameParameterTypeMethods);
+            parameterType = parameterType.getSuperclass();
         }
+
+        Method[] variableArityMethods = Arrays.stream(methods)
+                .filter(m -> m.getParameterCount() <= parameterIndex + 1)
+                .toArray(Method[]::new);
+
+        Collections.addAll(filteredMethodsMutable, variableArityMethods);
+
+        return filteredMethodsMutable.toArray(new Method[0]);
+
     }
 
     private static Method[] getVarArgsReceiverMethods(Class receiverType, String methodName) {
