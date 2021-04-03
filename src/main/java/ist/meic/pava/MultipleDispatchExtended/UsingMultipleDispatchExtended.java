@@ -85,48 +85,52 @@ public class UsingMultipleDispatchExtended {
 
         int orderOfDispatch = parameterTypes.length;
         Method[] acceptableReceiverMethods = getVarArgsReceiverMethods(receiverType, methodName);
+        acceptableReceiverMethods = Arrays.stream(acceptableReceiverMethods)
+                .filter(m -> m.getParameterCount() <= orderOfDispatch+1)
+                .toArray(Method[]::new);
 
-        for (int i = 0; i <= orderOfDispatch; i++) {
-
-            Class parameterType = (i == orderOfDispatch) ? null : parameterTypes[i];
-            acceptableReceiverMethods = filterVariableArityMethods(acceptableReceiverMethods, parameterType, i);
+        for (int i = 0; i < orderOfDispatch; i++) {
+            acceptableReceiverMethods = filterVariableArityMethods(acceptableReceiverMethods, parameterTypes[i], i);
         }
 
-        if (acceptableReceiverMethods.length == 0) {
-            throw new NoSuchMethodException();
-        }
-
-        return acceptableReceiverMethods[0];
+        Comparator<Method> byParameterCount = Comparator.comparingInt(Method::getParameterCount);
+        return Arrays.stream(acceptableReceiverMethods).max(byParameterCount).get();
     }
 
-    private static Method[] filterVariableArityMethods(Method[] methods, Class parameterType, int parameterIndex) {
+    private static Method[] filterVariableArityMethods(Method[] methods, Class parameterType, int parameterIndex) throws NoSuchMethodException {
 
-        if (parameterType != null) {
-            Method[] filteredMethods = Arrays.stream(methods)
-                    .filter(m -> m.getParameterCount() < parameterIndex + 1 || m.getParameterTypes()[parameterIndex] == parameterType)
-                    .toArray(Method[]::new);
+        boolean needClimbClassHierarchy;
 
-            Method[] variableArityMethod = Arrays.stream(methods)
-                    .filter(m -> m.getParameterCount() == parameterIndex + 1)
-                    .toArray(Method[]::new);
+        Method[] sameParameterTypeMethods = Arrays.stream(methods)
+                .filter(m -> m.getParameterCount() >= parameterIndex+1 && m.getParameterTypes()[parameterIndex] == parameterType)
+                .toArray(Method[]::new);
 
-            if (variableArityMethod.length != 0) {
-                filteredMethods = Arrays.stream(methods)
-                        .filter(m -> m.getParameterCount() > parameterIndex + 1)
-                        .toArray(Method[]::new);
+        needClimbClassHierarchy = (sameParameterTypeMethods.length == 0);
 
-                List<Method> filteredMethodsMutable = new ArrayList<Method>();
-                Collections.addAll(filteredMethodsMutable, filteredMethods);
-                Collections.addAll(filteredMethodsMutable, variableArityMethod[0]);
-                filteredMethods = filteredMethodsMutable.toArray(new Method[0]);
-            }
-
-            return filteredMethods;
-        }
-
-        return Arrays.stream(methods)
+        Method[] variableArityMethods = Arrays.stream(methods)
                 .filter(m -> m.getParameterCount() <= parameterIndex + 1)
                 .toArray(Method[]::new);
+
+        ArrayList<Method> filteredMethodsMutable = new ArrayList<>();
+        Collections.addAll(filteredMethodsMutable, sameParameterTypeMethods);
+        Collections.addAll(filteredMethodsMutable, variableArityMethods);
+        Method[] filteredMethods = filteredMethodsMutable.toArray(new Method[0]);
+
+        try {
+            if (needClimbClassHierarchy) {
+                throw new NoSuchMethodException();
+            } else {
+                return filteredMethods;
+            }
+        } catch (NoSuchMethodException e) {
+            if (parameterType == Object.class) {
+                if (variableArityMethods.length != 0){
+                    return variableArityMethods;}
+                throw e;
+            } else {
+                return filterVariableArityMethods(methods, parameterType.getSuperclass(), parameterIndex);
+            }
+        }
     }
 
     private static Method[] getVarArgsReceiverMethods(Class receiverType, String methodName) {
