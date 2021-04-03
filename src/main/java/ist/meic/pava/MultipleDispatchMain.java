@@ -135,9 +135,9 @@ public class MultipleDispatchMain {
     private static void variableArityTest(){
         VariableArity foo = new VariableArity();
 
-        //System.err.println("Giving: Integer, Long, Float, String");
-        //foo.poing(Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), "Poing");
-        //UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), "Poing");
+        System.err.println("Giving: Integer, Long, Float, String");
+        foo.poing(Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), "Poing");
+        UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), "Poing");
 
         System.err.println("Giving: Integer, Long, Float, Double, String");
         foo.poing(Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1), "ola");

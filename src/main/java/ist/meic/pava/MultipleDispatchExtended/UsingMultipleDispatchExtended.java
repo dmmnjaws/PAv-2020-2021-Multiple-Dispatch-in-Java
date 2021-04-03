@@ -72,13 +72,6 @@ public class UsingMultipleDispatchExtended {
         }
     }
 
-    private static Class[] getParameterTypes(Stream<Object> parameters) {
-
-        return parameters
-                .map(object -> object.getClass())
-                .toArray(Class[]::new);
-    }
-
     private static Method[] getAcceptableReceiverMethods(Class receiverType, String methodName, int orderOfDispatch) {
 
         return Stream.of(receiverType.getMethods())
