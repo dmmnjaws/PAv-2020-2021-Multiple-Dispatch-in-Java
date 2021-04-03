@@ -13,10 +13,12 @@ public class UsingMultipleDispatch {
 
     public static Object invoke(Object receiver, String methodName, Object... varArgs){
 
-        Stream<Object> parameters = Stream.of(varArgs);
+        Class[] parametersTypes = Stream.of(varArgs)
+                .map(object -> object.getClass())
+                .toArray(Class[]::new);
 
         try {
-            Method method = bestMethod(receiver.getClass(), methodName, getParameterTypes(parameters));
+            Method method = bestMethod(receiver.getClass(), methodName, parametersTypes);
             return method.invoke(receiver, varArgs);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
@@ -31,9 +33,7 @@ public class UsingMultipleDispatch {
         for (int i = 0; i < orderOfDispatch; i++){
             acceptableReceiverMethods = filterMethods(acceptableReceiverMethods, parameterTypes[i], i);
         }
-
         return acceptableReceiverMethods[0];
-
     }
 
     private static Method[] filterMethods(Method[] methods, Class parameterType, int parameterIndex) throws NoSuchMethodException {
@@ -55,13 +55,6 @@ public class UsingMultipleDispatch {
                 return filterMethods(methods, parameterType.getSuperclass(), parameterIndex);
             }
         }
-    }
-
-    private static Class[] getParameterTypes(Stream<Object> parameters){
-
-        return parameters
-                .map(object -> object.getClass())
-                .toArray(Class[]::new);
     }
 
     private static Method[] getAcceptableReceiverMethods(Class receiverType, String methodName, int orderOfDispatch) {

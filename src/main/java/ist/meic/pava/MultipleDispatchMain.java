@@ -139,25 +139,25 @@ public class MultipleDispatchMain {
         //foo.poing(Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), "Poing");
         //UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), "Poing");
 
-        System.err.println("Giving: Integer, Long, Float, Double");
-        foo.poing(Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1));
-        UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1));
+        System.err.println("Giving: Integer, Long, Float, Double, String");
+        foo.poing(Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1), "ola");
+        UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1), "ola");
 
-        //System.err.println("Giving: Integer, Long");
-        //foo.poing(Integer.valueOf(1), Long.valueOf(1));
-        //UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1));
+        System.err.println("Giving: Integer, Long");
+        foo.poing(Integer.valueOf(1), Long.valueOf(1));
+        UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1));
 
-        //System.err.println("Giving: Object[]");
-        //foo.poing(new Object[]{1,2,3});
-        //UsingMultipleDispatchExtended.invoke(foo, "poing", new Object[] {1,2,3});
+        System.err.println("Giving: Object[]");
+        foo.poing(new Object[]{1,2,3});
+        UsingMultipleDispatchExtended.invoke(foo, "poing", new Object[] {1,2,3});
 
-        //System.err.println("Giving: int, int, int");
-        //foo.poing(1,2,3);
-        //UsingMultipleDispatchExtended.invoke(foo, "poing", 1, 2, 3);
+        System.err.println("Giving: int, int, int");
+        foo.poing(1,2,3);
+        UsingMultipleDispatchExtended.invoke(foo, "poing", 1, 2, 3);
 
-        System.err.println("Giving: Object[] to poingWithArray");
-        foo.poingWithArray(new Object[] {1,2,3});
-        UsingMultipleDispatchExtended.invoke(foo, "poingWithArray", new Object[] {1,2,3});
+        //System.err.println("Giving: Object[] to poingWithArray");
+        //foo.poingWithArray(new Object[] {1,2,3});
+        //UsingMultipleDispatchExtended.invoke(foo, "poingWithArray", new Object[] {1,2,3});
 
     }
 }

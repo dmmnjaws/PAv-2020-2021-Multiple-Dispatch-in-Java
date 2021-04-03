@@ -10,6 +10,11 @@ public class VariableArity {
         System.err.println("poing with Integer, Long, Float and VariableArity options");
     }
 
+    public void poing(Integer i, Long l, Float f, Double d, String s, Integer i2, Object... options){
+        System.err.println("poing with Integer, Long, Float, Double, String, and VariableArity options");
+    }
+
+
     public void poing(Integer i, Long l, Object... options){
         System.err.println("poing with Integer, Long and VariableArity options");
     }
