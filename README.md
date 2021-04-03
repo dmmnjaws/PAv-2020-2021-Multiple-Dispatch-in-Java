@@ -15,7 +15,10 @@ The class `UsingMultipleDispatch.class` as well as the algorithm are described a
 
    To use multiple dispatch, one should invoke the static method from the class UsingMultipleDispatch.class: `public static invoke(Object receiver, String methodName, Object... varArgs)`
 
-   As preparation for the algorithm, the varAgrs is converted to a Stream of Objects, posteriorly mapped to their Types and converted to an array, by the method `private static Class[] getParameterTypes(Stream<Object> parameters)`.
+   As preparation for the algorithm, three data structures are set up:
+      - Class[] parameterTypes - the types of the parameters passed for the method one wants to invoke.
+      - Class receiverType - the type of the receiver of the method one wants to invoke.
+      - String methodName - the name of the method one wants to invoke.
 
    The method `private static Method bestMethod(Class receiverType, String methodName, Class[] parameterTypes)` is invoked to start the algorithm. The algorithm is described as follows:
 
@@ -35,7 +38,7 @@ The class `UsingMultipleDispatch.class` as well as the algorithm are described a
 
 
 ---
-## EXTENSIONS:
+## EXTENSIONS (GOAL):
 - **Dealing not only with the class hierarchy but also the interface hierarchy.**
 
 "Dealing with class hierarchy" means bestMethod() recursively calls itself with the argument's superclass, starting with the most specified class, until it finds the best method. So for instance, if we go further and add a CurvedLine.class that inherits Line.class and we add the relevant methods to print it, and calling invoking them using the dispatch class, the bestMethod() would iterate over the draw method using Shape, then using Line and then using CurvedLine as argument. We need to make this possible for interfaces also. 
