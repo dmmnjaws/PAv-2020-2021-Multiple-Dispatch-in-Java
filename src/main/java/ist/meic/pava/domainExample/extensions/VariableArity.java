@@ -1,8 +1,6 @@
 package ist.meic.pava.domainExample.extensions;
 
-import ist.meic.pava.domainExample.quadruple.Brush;
-import ist.meic.pava.domainExample.quadruple.Shape;
-import ist.meic.pava.domainExample.quadruple.StrokeWidth;
+import ist.meic.pava.domainExample.quadruple.*;
 
 public class VariableArity {
 
@@ -34,10 +32,6 @@ public class VariableArity {
         System.err.println("poing with Integer and Object... options");
     }
 
-    //public void poing(Number n, Integer i, Object... options){
-    //    System.err.println("poing with Number, Integer and VariableArity options");
-    //}
-
     public void poing(Integer i, Number n, Object... options){
         System.err.println("poing with Integer, Number and Object... options");
     }
@@ -56,6 +50,26 @@ public class VariableArity {
 
     public void poing(Object o, Brush b, StrokeWidth sw, Object... options){
         System.err.println("poing with a Object, Brush, StrokeWidth and Object... (you sure visited another package, uh!?)");
+    }
+
+    public void poing(Number i, Float l){
+        System.err.println("poing with Number, Float");
+    }
+
+    public void poing(Integer i, Long l){
+        System.err.println("poing with Integer, Long");
+    }
+
+    public void poing(Integer i, Line l){
+        System.err.println("poing with Integer, Line");
+    }
+
+    public void poing(Integer i, Brush l){
+        System.err.println("poing with Integer, Brush");
+    }
+
+    public void poing(Line l, Fat f){
+        System.err.println("poing with Line, Fat");
     }
 
     /**

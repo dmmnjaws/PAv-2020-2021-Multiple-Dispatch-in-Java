@@ -34,9 +34,11 @@ public class MultipleDispatchMain {
 
                 default:
                     defaultDispatchTest();
+
             }
-        } else {
-            defaultDispatchTest();
+
+        } else { //other specialized examples.
+
         }
     }
 
@@ -134,6 +136,10 @@ public class MultipleDispatchMain {
      */
     private static void variableArityTest(){
         VariableArity foo = new VariableArity();
+
+        System.err.println("\n> Giving: Integer, Float");
+        foo.poing(Integer.valueOf(1), Float.valueOf(1));
+        UsingMultipleDispatchExtended.invoke(new VariableArity(), "poing", Integer.valueOf(1), Float.valueOf(1));
 
         System.err.println("\n> Giving: Integer, Long");
         foo.poing(Integer.valueOf(1), Long.valueOf(1));

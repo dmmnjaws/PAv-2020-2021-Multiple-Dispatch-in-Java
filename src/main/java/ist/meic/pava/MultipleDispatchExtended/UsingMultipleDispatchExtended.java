@@ -41,7 +41,7 @@ public class UsingMultipleDispatchExtended {
     private static Method bestMethod(Class receiverType, String methodName, Class[] parameterTypes) throws NoSuchMethodException {
 
         int orderOfDispatch = parameterTypes.length;
-        Method[] acceptableReceiverMethods = getAcceptableReceiverMethods(receiverType, methodName, orderOfDispatch);
+        Method[] acceptableReceiverMethods = getAcceptableReceiverMethods(receiverType, methodName, parameterTypes, orderOfDispatch);
 
         for (int i = 0; i < orderOfDispatch; i++) {
             acceptableReceiverMethods = filterMethods(acceptableReceiverMethods, parameterTypes[i], i);
@@ -71,11 +71,36 @@ public class UsingMultipleDispatchExtended {
         }
     }
 
-    private static Method[] getAcceptableReceiverMethods(Class receiverType, String methodName, int orderOfDispatch) {
+    private static Method[] getAcceptableReceiverMethods(Class receiverType, String methodName, Class[] parameterTypes, int orderOfDispatch) {
 
-        return Stream.of(receiverType.getMethods())
+        Method[] acceptableReceiverMethods = Stream.of(receiverType.getMethods())
                 .filter(m -> m.getName() == methodName && m.getParameterCount() == orderOfDispatch && !m.isVarArgs())
                 .toArray(Method[]::new);
+
+        for (int i = 0; i < orderOfDispatch; i++){
+            int finalI = i;
+            ArrayList<Class> superClasses = getAllSuperclasses(parameterTypes[i]);
+            superClasses.add(parameterTypes[i]);
+            acceptableReceiverMethods = Stream.of(acceptableReceiverMethods)
+                    .filter(m -> superClasses.contains(m.getParameterTypes()[finalI]))
+                    .toArray(Method[]::new);
+        }
+
+        return acceptableReceiverMethods;
+    }
+
+    private static ArrayList<Class> getAllSuperclasses(Class parameterTypes){
+
+        ArrayList<Class> allSuperClasses = new ArrayList<>();
+
+        while(parameterTypes.getSuperclass() != Object.class){
+            allSuperClasses.add(parameterTypes.getSuperclass());
+            parameterTypes = parameterTypes.getSuperclass();
+        }
+
+        allSuperClasses.add(Object.class);
+
+        return allSuperClasses;
     }
 
     // VARIABLE ARITY
@@ -91,12 +116,12 @@ public class UsingMultipleDispatchExtended {
 
         Class minimumCommonSuperClass = getMinimumCommonSuperclass(parameterTypes, orderOfDispatch);
 
+        boolean safeMode = false;
         for (int i = 0; i < orderOfDispatch; i++) {
-            acceptableReceiverMethods = filterVariableArityMethodsI(acceptableReceiverMethods, parameterTypes[i], i);
-        }
-
-        for (int i = 0; i < orderOfDispatch; i++) {
-            acceptableReceiverMethods = filterVariableArityMethodsII(acceptableReceiverMethods, parameterTypes[i], i);
+            acceptableReceiverMethods = filterVariableArityMethods(acceptableReceiverMethods, parameterTypes[i], i, safeMode);
+            if (!safeMode && i == orderOfDispatch - 1){
+                i = 0;
+                safeMode = true; }
         }
 
         if(acceptableReceiverMethods.length == 0){
@@ -122,35 +147,11 @@ public class UsingMultipleDispatchExtended {
      * Filters out all methods than can't absolutely receive the parameterType in the "parameter slot" number parameterIndex
      *
      */
-    private static Method[] filterVariableArityMethodsI(Method[] methods, Class parameterType, int parameterIndex) {
+    private static Method[] filterVariableArityMethods(Method[] methods, Class parameterType, int parameterIndex, boolean safeMode) {
 
         ArrayList<Method> filteredMethodsMutable = new ArrayList<>();
 
-        while(true){
-            Class finalParameterType = parameterType;
-            Method[] sameParameterTypeMethods = Arrays.stream(methods)
-                    .filter(m -> m.getParameterCount() >= parameterIndex+1 && m.getParameterTypes()[parameterIndex] == finalParameterType)
-                    .toArray(Method[]::new);
-            Collections.addAll(filteredMethodsMutable, sameParameterTypeMethods);
-            parameterType = parameterType.getSuperclass();
-            if(parameterType == null){ break; }
-        }
-
-        Method[] variableArityMethods = Arrays.stream(methods)
-                .filter(m -> m.getParameterCount() <= parameterIndex + 1)
-                .toArray(Method[]::new);
-
-        Collections.addAll(filteredMethodsMutable, variableArityMethods);
-
-        return filteredMethodsMutable.toArray(new Method[0]);
-
-    }
-
-    private static Method[] filterVariableArityMethodsII(Method[] methods, Class parameterType, int parameterIndex) throws NoSuchMethodException {
-
-        ArrayList<Method> filteredMethodsMutable = new ArrayList<>();
-
-        while(filteredMethodsMutable.isEmpty()){
+        while((!safeMode) || (safeMode && filteredMethodsMutable.isEmpty())){
             Class finalParameterType = parameterType;
             Method[] sameParameterTypeMethods = Arrays.stream(methods)
                     .filter(m -> m.getParameterCount() >= parameterIndex+1 && m.getParameterTypes()[parameterIndex] == finalParameterType)
@@ -175,7 +176,7 @@ public class UsingMultipleDispatchExtended {
         ArrayList<Class> allSuperClasses = new ArrayList<>();
 
         for (Class parameterType : parameterTypes){
-            Collections.addAll(allSuperClasses, getAllSuperclasses(parameterType));
+            allSuperClasses.addAll(getAllSuperclasses(parameterType));
         }
 
         Map<Class, Integer> counter = new HashMap<>();
@@ -191,20 +192,6 @@ public class UsingMultipleDispatchExtended {
         }
 
         return Object.class;
-    }
-
-    private static Class[] getAllSuperclasses(Class parameterTypes){
-
-        ArrayList<Class> allSuperClasses = new ArrayList<>();
-
-        while(parameterTypes.getSuperclass() != Object.class){
-            allSuperClasses.add(parameterTypes.getSuperclass());
-            parameterTypes = parameterTypes.getSuperclass();
-        }
-
-        allSuperClasses.add(Object.class);
-
-        return allSuperClasses.toArray(new Class[0]);
     }
 
     private static Method[] getVarArgsReceiverMethods(Class receiverType, String methodName) {
@@ -232,8 +219,6 @@ public class UsingMultipleDispatchExtended {
 
         return varArgsMethod.invoke(receiver, argumentsArrayList.toArray());
     }
-
-
 
     // BOXING AND UNBOXING
 

@@ -2,6 +2,7 @@ package ist.meic.pava.MultipleDispatch;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -28,7 +29,7 @@ public class UsingMultipleDispatch {
     private static Method bestMethod(Class receiverType, String methodName, Class[] parameterTypes) throws NoSuchMethodException {
 
         int orderOfDispatch = parameterTypes.length;
-        Method[] acceptableReceiverMethods = getAcceptableReceiverMethods(receiverType, methodName, orderOfDispatch);
+        Method[] acceptableReceiverMethods = getAcceptableReceiverMethods(receiverType, methodName, parameterTypes, orderOfDispatch);
 
         for (int i = 0; i < orderOfDispatch; i++){
             acceptableReceiverMethods = filterMethods(acceptableReceiverMethods, parameterTypes[i], i);
@@ -57,10 +58,35 @@ public class UsingMultipleDispatch {
         }
     }
 
-    private static Method[] getAcceptableReceiverMethods(Class receiverType, String methodName, int orderOfDispatch) {
+    private static Method[] getAcceptableReceiverMethods(Class receiverType, String methodName, Class[] parameterTypes, int orderOfDispatch) {
 
-        return Stream.of(receiverType.getMethods())
-                .filter(m -> m.getName() == methodName && m.getParameterCount() == orderOfDispatch)
+        Method[] acceptableReceiverMethods = Stream.of(receiverType.getMethods())
+                .filter(m -> m.getName() == methodName && m.getParameterCount() == orderOfDispatch && !m.isVarArgs())
                 .toArray(Method[]::new);
+
+        for (int i = 0; i < orderOfDispatch; i++){
+            int finalI = i;
+            ArrayList<Class> superClasses = getAllSuperclasses(parameterTypes[i]);
+            superClasses.add(parameterTypes[i]);
+            acceptableReceiverMethods = Stream.of(acceptableReceiverMethods)
+                    .filter(m -> superClasses.contains(m.getParameterTypes()[finalI]))
+                    .toArray(Method[]::new);
+        }
+
+        return acceptableReceiverMethods;
+    }
+
+    private static ArrayList<Class> getAllSuperclasses(Class parameterTypes){
+
+        ArrayList<Class> allSuperClasses = new ArrayList<>();
+
+        while(parameterTypes.getSuperclass() != Object.class){
+            allSuperClasses.add(parameterTypes.getSuperclass());
+            parameterTypes = parameterTypes.getSuperclass();
+        }
+
+        allSuperClasses.add(Object.class);
+
+        return allSuperClasses;
     }
 }
