@@ -6,20 +6,32 @@ import ist.meic.pava.domainExample.quadruple.StrokeWidth;
 
 public class VariableArity {
 
+    public void poing(Number n1, Number n2){
+        System.err.println("poing with Number, Number");
+    }
+    
     public void poing(Integer i, Long l, Float f, String s){
         System.err.println("poing with Integer, Long, Float, String");
     }
 
     public void poing(Integer i, Long l, Float f, Object... options){
-        System.err.println("poing with Integer, Long, Float and VariableArity options");
+        System.err.println("poing with Integer, Long, Float and Object... options");
+    }
+
+    public void poing(Integer i, Long l, Float f, Number... options){
+        System.err.println("poing with Integer, Long, Float and Number... options");
     }
 
     public void poing(Integer i, Long l, Float f, Double d, String s, Integer i2, Object... options){
-        System.err.println("poing with Integer, Long, Float, Double, String, and VariableArity options");
+        System.err.println("poing with Integer, Long, Float, Double, String, and Object... options");
     }
 
     public void poing(Number n, Object... options){
-        System.err.println("poing with Number and VariableArity options");
+        System.err.println("poing with Number and Object... options");
+    }
+
+    public void poing(Integer i, Object... options){
+        System.err.println("poing with Integer and Object... options");
     }
 
     //public void poing(Number n, Integer i, Object... options){
@@ -27,23 +39,23 @@ public class VariableArity {
     //}
 
     public void poing(Integer i, Number n, Object... options){
-        System.err.println("poing with Integer, Number and VariableArity options");
+        System.err.println("poing with Integer, Number and Object... options");
     }
 
     public void poing(Integer i, Long l, Object... options){
-        System.err.println("poing with Integer, Long and VariableArity options");
+        System.err.println("poing with Integer, Long and Object... options");
     }
 
-    public void point(Integer i, Object... options){
-        System.err.println("poing with Integer and VariableArity options");
+    public void poing(Integer i, Number... options){
+        System.err.println("poing with Integer and Number... options");
     }
 
     public void poing(Object... options){
-        System.err.println("poing with VariableArity options");
+        System.err.println("poing with Object... options");
     }
 
-    public void poing(Shape s, Brush b, StrokeWidth sw, Object... options){
-        System.err.println("poing with a Shape, Brush, StrokeWidth and VariableArity (you sure visited another package, uh!?)");
+    public void poing(Object o, Brush b, StrokeWidth sw, Object... options){
+        System.err.println("poing with a Object, Brush, StrokeWidth and Object... (you sure visited another package, uh!?)");
     }
 
     /**

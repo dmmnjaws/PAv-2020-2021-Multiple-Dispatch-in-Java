@@ -1,8 +1,7 @@
 package ist.meic.pava.MultipleDispatchExtended;
 
-import javassist.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -75,7 +74,7 @@ public class UsingMultipleDispatchExtended {
     private static Method[] getAcceptableReceiverMethods(Class receiverType, String methodName, int orderOfDispatch) {
 
         return Stream.of(receiverType.getMethods())
-                .filter(m -> m.getName() == methodName && m.getParameterCount() == orderOfDispatch)
+                .filter(m -> m.getName() == methodName && m.getParameterCount() == orderOfDispatch && !m.isVarArgs())
                 .toArray(Method[]::new);
     }
 
@@ -84,10 +83,13 @@ public class UsingMultipleDispatchExtended {
     private static Method bestVariableArityMethod(Class receiverType, String methodName, Class[] parameterTypes) throws NoSuchMethodException {
 
         int orderOfDispatch = parameterTypes.length;
+
         Method[] acceptableReceiverMethods = getVarArgsReceiverMethods(receiverType, methodName);
         acceptableReceiverMethods = Arrays.stream(acceptableReceiverMethods)
                 .filter(m -> m.getParameterCount() <= orderOfDispatch+1)
                 .toArray(Method[]::new);
+
+        Class minimumCommonSuperClass = getMinimumCommonSuperclass(parameterTypes, orderOfDispatch);
 
         for (int i = 0; i < orderOfDispatch; i++) {
             acceptableReceiverMethods = filterVariableArityMethodsI(acceptableReceiverMethods, parameterTypes[i], i);
@@ -101,21 +103,37 @@ public class UsingMultipleDispatchExtended {
             throw new NoSuchMethodException();
         }
 
+        Method[] lastCandidateMethods = new Method[]{};
+
+        while(lastCandidateMethods.length == 0){
+            Class finalMinimumCommonSuperClass = minimumCommonSuperClass;
+            lastCandidateMethods = Arrays.stream(acceptableReceiverMethods)
+                .filter(m -> m.getParameterTypes()[m.getParameterCount()-1].getComponentType() == finalMinimumCommonSuperClass)
+                .toArray(Method[]::new);
+            minimumCommonSuperClass = minimumCommonSuperClass.getSuperclass();
+            if (minimumCommonSuperClass == null){ break; }
+        }
+
         Comparator<Method> byParameterCount = Comparator.comparingInt(Method::getParameterCount);
-        return Arrays.stream(acceptableReceiverMethods).max(byParameterCount).get();
+        return Arrays.stream(lastCandidateMethods).max(byParameterCount).get();
     }
 
+    /**
+     * Filters out all methods than can't absolutely receive the parameterType in the "parameter slot" number parameterIndex
+     *
+     */
     private static Method[] filterVariableArityMethodsI(Method[] methods, Class parameterType, int parameterIndex) {
 
         ArrayList<Method> filteredMethodsMutable = new ArrayList<>();
 
-        while(parameterType != Object.class){
+        while(true){
             Class finalParameterType = parameterType;
             Method[] sameParameterTypeMethods = Arrays.stream(methods)
                     .filter(m -> m.getParameterCount() >= parameterIndex+1 && m.getParameterTypes()[parameterIndex] == finalParameterType)
                     .toArray(Method[]::new);
             Collections.addAll(filteredMethodsMutable, sameParameterTypeMethods);
             parameterType = parameterType.getSuperclass();
+            if(parameterType == null){ break; }
         }
 
         Method[] variableArityMethods = Arrays.stream(methods)
@@ -132,13 +150,14 @@ public class UsingMultipleDispatchExtended {
 
         ArrayList<Method> filteredMethodsMutable = new ArrayList<>();
 
-        while(filteredMethodsMutable.isEmpty() && parameterType != Object.class){
+        while(filteredMethodsMutable.isEmpty()){
             Class finalParameterType = parameterType;
             Method[] sameParameterTypeMethods = Arrays.stream(methods)
                     .filter(m -> m.getParameterCount() >= parameterIndex+1 && m.getParameterTypes()[parameterIndex] == finalParameterType)
                     .toArray(Method[]::new);
             Collections.addAll(filteredMethodsMutable, sameParameterTypeMethods);
             parameterType = parameterType.getSuperclass();
+            if(parameterType == null){ break; }
         }
 
         Method[] variableArityMethods = Arrays.stream(methods)
@@ -149,6 +168,43 @@ public class UsingMultipleDispatchExtended {
 
         return filteredMethodsMutable.toArray(new Method[0]);
 
+    }
+
+    private static Class getMinimumCommonSuperclass(Class[] parameterTypes, int orderOfDispatch){
+
+        ArrayList<Class> allSuperClasses = new ArrayList<>();
+
+        for (Class parameterType : parameterTypes){
+            Collections.addAll(allSuperClasses, getAllSuperclasses(parameterType));
+        }
+
+        Map<Class, Integer> counter = new HashMap<>();
+
+        for (Class superClass : allSuperClasses) {
+            if(!counter.containsKey(superClass)){
+                counter.put(superClass, 0);
+            }
+            counter.put(superClass, counter.get(superClass) + 1);
+            if(counter.get(superClass) == orderOfDispatch){
+                return superClass;
+            }
+        }
+
+        return Object.class;
+    }
+
+    private static Class[] getAllSuperclasses(Class parameterTypes){
+
+        ArrayList<Class> allSuperClasses = new ArrayList<>();
+
+        while(parameterTypes.getSuperclass() != Object.class){
+            allSuperClasses.add(parameterTypes.getSuperclass());
+            parameterTypes = parameterTypes.getSuperclass();
+        }
+
+        allSuperClasses.add(Object.class);
+
+        return allSuperClasses.toArray(new Class[0]);
     }
 
     private static Method[] getVarArgsReceiverMethods(Class receiverType, String methodName) {
@@ -165,15 +221,19 @@ public class UsingMultipleDispatchExtended {
         Object[] arguments = Arrays.copyOfRange(varArgs, 0, numberOfNonVarParameters);
         Object[] variableArguments = Arrays.copyOfRange(varArgs, numberOfNonVarParameters, varArgs.length);
 
+        Class<?> varArgsType = varArgsMethod.getParameterTypes()[varArgsMethod.getParameterCount() - 1].getComponentType();
+
         ArrayList<Object> argumentsArrayList = new ArrayList<>();
         for(int i = 0; i < numberOfNonVarParameters; i++){
             argumentsArrayList.add(arguments[i]);
         }
 
-        argumentsArrayList.add(variableArguments);
+        argumentsArrayList.add(Array.newInstance(varArgsType, variableArguments.length));
 
         return varArgsMethod.invoke(receiver, argumentsArrayList.toArray());
     }
+
+
 
     // BOXING AND UNBOXING
 
