@@ -37,7 +37,7 @@ public class MultipleDispatchMain {
 
             }
 
-        } else { //other specialized examples.
+        } else { //other specialized tests
 
         }
     }

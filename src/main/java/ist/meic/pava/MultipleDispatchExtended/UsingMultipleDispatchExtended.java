@@ -1,7 +1,6 @@
 package ist.meic.pava.MultipleDispatchExtended;
 
 import java.lang.reflect.*;
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Stream;
 

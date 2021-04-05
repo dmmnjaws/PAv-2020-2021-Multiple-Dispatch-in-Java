@@ -34,6 +34,7 @@ public class UsingMultipleDispatch {
         for (int i = 0; i < orderOfDispatch; i++){
             acceptableReceiverMethods = filterMethods(acceptableReceiverMethods, parameterTypes[i], i);
         }
+
         return acceptableReceiverMethods[0];
     }
 
@@ -44,13 +45,13 @@ public class UsingMultipleDispatch {
                 .toArray(Method[]::new);
 
         try {
-            if (filteredMethods.length == 0){
+            if (filteredMethods.length == 0) {
                 throw new NoSuchMethodException();
-            }else{
+            } else {
                 return filteredMethods;
             }
         } catch (NoSuchMethodException e) {
-            if(parameterType == Object.class) {
+            if (parameterType == Object.class) {
                 throw e;
             } else {
                 return filterMethods(methods, parameterType.getSuperclass(), parameterIndex);
