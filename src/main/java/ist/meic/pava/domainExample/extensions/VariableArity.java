@@ -75,7 +75,7 @@ public class VariableArity {
     /**
      * This one our MultipleDispatchExtended doesn't support,
      * because it can't distinguish between Options[] and the Options... varArgs array,
-     * and so, it treats an Object[] one argument at the time instead of a single argument of type array.
+     * and so, it treats an Object[] one argument at the time instead of a single Object[] argument.
      */
     public void poingWithArray(Object[] options){
         System.err.println("poing with Array");

@@ -5,10 +5,9 @@ import java.util.*;
 import java.util.stream.Stream;
 
 /**
- * This class is an extension of ist.meic.pava.MultipleDispatch.UsingMultipleDispatch.class and
- * implements the following extensions:
- * - Multiple Dispatch with support for Variable Arity methods.
- *
+ * This class is an extension of ist.meic.pava.MultipleDispatch.UsingMultipleDispatch.class and additionally, it implements:
+ * - Support for Variable Arity methods.
+ * - Support for Memoization of Previous Invocations
  */
 public class UsingMultipleDispatchExtended {
 
@@ -18,17 +17,50 @@ public class UsingMultipleDispatchExtended {
                 .map(object -> object.getClass())
                 .toArray(Class[]::new);
 
+        Class receiverType = receiver.getClass();
+
+        // get method cache
+        String invocationString = invocationStringBuilder(receiverType, methodName, parameterTypes);
+        MultipleDispatchCacheSingleton multipleDispatchCacheSingleton = MultipleDispatchCacheSingleton.getInstance();
+        boolean isCached = multipleDispatchCacheSingleton.isCached(invocationString);
+
         try {
-            Method method = bestMethod(receiver.getClass(), methodName, parameterTypes);
+            // if method in cache, return it
+            // if method in cache but null, it's known there's no suitable method in the receiver, throw NoSuchMethodException()
+            if(isCached){
+                Method method = multipleDispatchCacheSingleton.getCachedMethod(invocationString);
+                if (method == null){
+                    throw new NoSuchMethodException();
+                }
+
+                Object result = (method.isVarArgs()) ? invokeVarArgsMethod(method, receiver, varArgs) : method.invoke(receiver, varArgs);
+                return result;
+            }
+
+            // if method not in cache, do the usual thing, go check non variable arity methods first
+            // if method found, store it in cache
+            Method method = bestMethod(receiverType, methodName, parameterTypes);
+            multipleDispatchCacheSingleton.putUncachedMethod(invocationString, method);
             return method.invoke(receiver, varArgs);
 
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e1) {
             if (e1.getClass().equals(NoSuchMethodException.class)) {
                 try {
-                    Method method = bestVariableArityMethod(receiver.getClass(), methodName, parameterTypes);
+                    // if NoSuchMethodException() came from null method in cache, rethrow exception, there's no suitable method.
+                    if(isCached) {
+                        throw new NoSuchMethodException();
+                    }
+
+                    // if NoSuchMethodException() came from non variable arity search, go look in the variable arity methods
+                    // if method found, store it in cache
+                    Method method = bestVariableArityMethod(receiverType, methodName, parameterTypes);
+                    multipleDispatchCacheSingleton.putUncachedMethod(invocationString, method);
                     return invokeVarArgsMethod(method, receiver, varArgs);
 
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e2) {
+
+                    // if no method found, store in cache with null method (redundant in current implementation, it's here for future considerations)
+                    multipleDispatchCacheSingleton.putUncachedMethod(invocationString, null);
                     throw new RuntimeException(e2);
                 }
 
@@ -61,12 +93,14 @@ public class UsingMultipleDispatchExtended {
             } else {
                 return filteredMethods;
             }
+
         } catch (NoSuchMethodException e) {
             if (parameterType == Object.class) {
                 throw e;
             } else {
                 return filterMethods(methods, parameterType.getSuperclass(), parameterIndex);
             }
+
         }
     }
 
@@ -88,13 +122,13 @@ public class UsingMultipleDispatchExtended {
         return acceptableReceiverMethods;
     }
 
-    private static ArrayList<Class> getAllSuperclasses(Class parameterTypes){
+    private static ArrayList<Class> getAllSuperclasses(Class parameterType){
 
         ArrayList<Class> allSuperClasses = new ArrayList<>();
 
-        while(parameterTypes.getSuperclass() != Object.class){
-            allSuperClasses.add(parameterTypes.getSuperclass());
-            parameterTypes = parameterTypes.getSuperclass();
+        while(parameterType.getSuperclass() != Object.class){
+            allSuperClasses.add(parameterType.getSuperclass());
+            parameterType = parameterType.getSuperclass();
         }
 
         allSuperClasses.add(Object.class);
@@ -217,6 +251,18 @@ public class UsingMultipleDispatchExtended {
         argumentsArrayList.add(Array.newInstance(varArgsType, variableArguments.length));
 
         return varArgsMethod.invoke(receiver, argumentsArrayList.toArray());
+    }
+
+    // MEMOIZATION
+
+    private static String invocationStringBuilder(Class receiverType, String methodName, Class[] parameterTypes){
+        String invocationString = receiverType.getName() + methodName;
+
+        for (Class parameterType : parameterTypes) {
+            invocationString = invocationString + parameterType.getName();
+        }
+
+        return invocationString;
     }
 
     // BOXING AND UNBOXING

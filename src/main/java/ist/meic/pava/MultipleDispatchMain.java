@@ -39,6 +39,8 @@ public class MultipleDispatchMain {
 
         } else { //other specialized tests
 
+            UsingMultipleDispatch.invoke(new VariableArity(), "poing", Integer.valueOf(1), Float.valueOf(1));
+
         }
     }
 
@@ -177,6 +179,18 @@ public class MultipleDispatchMain {
         System.err.println("\n> Giving: int, int, int");
         foo.poing(1,2,3);
         UsingMultipleDispatchExtended.invoke(foo, "poing", 1, 2, 3);
+
+        System.err.println("\n> Giving: Integer, Long, Float, Double, String");
+        foo.poing(Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1), "ola");
+        UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1), "ola");
+
+        System.err.println("\n> Giving: Integer, Long, Float, Double, String");
+        foo.poing(Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1), "ola");
+        UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1), "ola");
+
+        System.err.println("\n> Giving: Integer, Long, Float, Double, String");
+        foo.poing(Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1), "ola");
+        UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1), "ola");
 
         /**
         System.err.println("\n> Giving: Object[] to poingWithArray");
