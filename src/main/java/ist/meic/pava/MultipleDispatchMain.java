@@ -25,11 +25,11 @@ public class MultipleDispatchMain {
                 case "quadruple":
                     quadrupleDispatchTest();
                     break;
-                case "boxunbox":
-                    boxingUnboxingTest();
-                    break;
                 case "variablearity":
                     variableArityTest();
+                    break;
+                case "boxunbox": //(for future considerations)
+                    boxingUnboxingTest();
                     break;
 
                 default:
@@ -40,12 +40,13 @@ public class MultipleDispatchMain {
         } else { //other specialized tests
 
             UsingMultipleDispatch.invoke(new VariableArity(), "poing", Integer.valueOf(1), Float.valueOf(1));
+            UsingMultipleDispatchExtended.invoke(new VariableArity(), "poing", Integer.valueOf(1), Float.valueOf(1));
 
         }
     }
 
     /**
-     * Invokes UsingMultipleDispatch.invoke() in a Double Dispatch scenario.
+     * Invokes UsingMultipleDispatch.invoke() and UsingMultipleDispatchExtended.invoke() in a Double Dispatch scenario.
      */
     private static void doubleDispatchTest() {
 
@@ -55,12 +56,13 @@ public class MultipleDispatchMain {
             for (Shape shape : shapes) {
                 //device.draw(shape); //without dynamic invocation
                 UsingMultipleDispatch.invoke(device, "draw",shape);
+                UsingMultipleDispatchExtended.invoke(device, "draw",shape);
             }
         }
     }
 
     /**
-     * Invokes UsingMultipleDispatch.invoke() in a Triple Dispatch scenario.
+     * Invokes UsingMultipleDispatch.invoke() and UsingMultipleDispatchExtended.invoke() in a Triple Dispatch scenario.
      */
     private static void tripleDispatchTest() {
 
@@ -71,13 +73,14 @@ public class MultipleDispatchMain {
             for (Shape shape : shapes) {
                 for (Brush brush : brushes) {
                     UsingMultipleDispatch.invoke(device, "draw", shape, brush);
+                    UsingMultipleDispatchExtended.invoke(device, "draw",shape, brush);
                 }
             }
         }
     }
 
     /**
-     * Invokes UsingMultipleDispatch.invoke() in a Quadruple Dispatch scenario.
+     * Invokes UsingMultipleDispatch.invoke() and UsingMultipleDispatchExtended.invoke() in a Quadruple Dispatch scenario.
      */
     private static void quadrupleDispatchTest() {
 
@@ -90,6 +93,7 @@ public class MultipleDispatchMain {
                 for (Brush brush : brushes) {
                     for (StrokeWidth strokeWidth : strokeWidths){
                         UsingMultipleDispatch.invoke(device, "draw", shape, brush, strokeWidth);
+                        UsingMultipleDispatchExtended.invoke(device, "draw", shape, brush, strokeWidth);
                     }
                 }
             }
@@ -97,7 +101,7 @@ public class MultipleDispatchMain {
     }
 
     /**
-     * Invokes UsingMultipleDispatch.invoke() in the Triple Dispatch scenario described in the project statement.
+     * Invokes UsingMultipleDispatch.invoke() and UsingMultipleDispatchExtended.invoke() in the Triple Dispatch scenario described in the project statement.
      */
     private static void defaultDispatchTest() {
 
@@ -117,20 +121,10 @@ public class MultipleDispatchMain {
             for (ist.meic.pava.domainExample.statement.Shape shape : shapes) {
                 for (ist.meic.pava.domainExample.statement.Brush brush : brushes) {
                     UsingMultipleDispatch.invoke(device, "draw", shape, brush);
+                    UsingMultipleDispatchExtended.invoke(device, "draw", shape, brush);
                 }
             }
         }
-    }
-
-    /**
-     * Invokes UsingMultipleDispatchExtended.invoke() in a Boxing/Unboxing scenario.
-     */
-    private static void boxingUnboxingTest(){
-        BoxingUnboxing foo = new BoxingUnboxing();
-        foo.bar(1);
-        foo.bar(Integer.valueOf(1));
-        UsingMultipleDispatchExtended.invoke(new BoxingUnboxing(), "bar", 1);
-        UsingMultipleDispatchExtended.invoke(new BoxingUnboxing(), "bar", Integer.valueOf(1));
     }
 
     /**
@@ -192,10 +186,22 @@ public class MultipleDispatchMain {
         foo.poing(Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1), "ola");
         UsingMultipleDispatchExtended.invoke(foo, "poing", Integer.valueOf(1), Long.valueOf(1), Float.valueOf(1), Double.valueOf(1.1), "ola");
 
-        /**
-        System.err.println("\n> Giving: Object[] to poingWithArray");
-        foo.poingWithArray(new Object[] {1,2,3});
-        UsingMultipleDispatchExtended.invoke(foo, "poingWithArray", new Object[] {1,2,3});
-         **/
+        // Shows our algorithm doesn't support methods that have primitive arrays as parameters
+        // System.err.println("\n> Giving: Object[] to poingWithArray");
+        // foo.poingWithArray(new Object[] {1,2,3});
+        // UsingMultipleDispatchExtended.invoke(foo, "poingWithArray", new Object[] {1,2,3});
+
+    }
+
+    /**
+     * Invokes UsingMultipleDispatchExtended.invoke() in a Boxing/Unboxing scenario.
+     * (For future considerations)
+     */
+    private static void boxingUnboxingTest(){
+        BoxingUnboxing foo = new BoxingUnboxing();
+        foo.bar(1);
+        foo.bar(Integer.valueOf(1));
+        UsingMultipleDispatchExtended.invoke(new BoxingUnboxing(), "bar", 1);
+        UsingMultipleDispatchExtended.invoke(new BoxingUnboxing(), "bar", Integer.valueOf(1));
     }
 }

@@ -24,9 +24,9 @@ The class `UsingMultipleDispatch.class` as well as the algorithm are described a
 
    1. A metric called the "orderOfDispatch" is collected. This metric allows us to know beforehand the number of parameters to be dispatched. Therefore, a double dispatch method call, with one parameter, would produce an orderOfDispatch equal to 1.
 
-   2. The method `private static Method[] getAcceptableReceiverMethods(Class receiverType, String methodName, int orderOfDispatch)` is invoked and implements the following behaviour: All public methods implemented by the receiver, including super methods are fetched into a Stream, which is then filtered, leaving only the methods with the same name and same number of parameters as the original call, equal to the orderOfDispatch, and finally converted to an array and returned. The stream is returned as an array to avoid invalidation due to the use of terminal operations, necessary later on. (Such as knowing the stream's length, which is done thru the method stream.count(), that is terminal operation).
+   2. The method `private static Method[] getAcceptableReceiverMethods(Class receiverType, String methodName, int orderOfDispatch)` is invoked and implements the following behaviour: All public methods implemented by the receiver, including super methods are fetched into a Stream, which is then filtered, leaving only the methods with the same name and same number of parameters as the original call, equal to the orderOfDispatch. Then, all non applicable methods (whose parameters' class hierarchies don't coincide with the class hierarchies of the parameters of the arguments of the original call) are filtered out. Finally, the filtered stream is converted to an array and returned. The stream is returned as an array to avoid invalidation due to the use of terminal operations, necessary later on. (Such as knowing the stream's length, which is done thru the method stream.count(), a terminal operation).
 
-   3. Now we have an array of valid methods (public methods of the receiver, with same name and same number of parameters as original call), let's call it `acceptableReceiverMethods`. A recursive filter is applied to `acceptableReceiverMethods`, where each iteration is going to "crop" more and more unfit methods from the array, until, a single method remains (or a NoSuchMethodException is thrown). Two iterations are in play here: From the 1st to the last parameter (outer iteration, the loop in the `bestMethod` method), and for each parameter, the recursive filtering to find the "qualified" methods. This recursive filtering is described in 4.
+   3. Now we have an array of applicable methods (public methods of the receiver, with same name and same number of parameters as original call), called `acceptableReceiverMethods`. A recursive filter is applied to `acceptableReceiverMethods`, where each iteration is going to "crop" more and more unfit methods from the array, until, a single method remains (or a NoSuchMethodException is thrown). Two iterations are in play here: From the 1st to the last parameter (outer iteration, the loop in the `bestMethod` method), and for each parameter, the recursive filtering to find the "qualified" methods. This recursive filtering is described in 4.
 
    4. The method `private static Method[] filterMethods(Method[] methods, Class parameterType, int parameterIndex)` implements the second degree of filtering. Given an array of qualified methods, the type of a parameter of the original call, and the index of said parameter (the first parameter of the function has index 0), the array of qualified methods is filtered, leaving only the methods whose parameterIndex-nd parameter is of type parameterType. If the filtered array is empty, we call the filterMethods recursively, but with the superclass of parameterType as argument, climbing up the class hierarchy. In the end, the produced result should be a filtered version of `acceptableReceiverMethods`. If the recursive call goes on until the parameterType is identified to be of the type Object.class, a NoSuchMethodException is thrown.
 
@@ -38,7 +38,19 @@ The class `UsingMultipleDispatch.class` as well as the algorithm are described a
 
 
 ---
-## EXTENSIONS (GOAL):
+## IMPLEMENTED EXTENSIONS:
+
+- **Dealing with variable arity methods.** 
+
+The variable arity of methods relates to the number of arguments a method needs to be invoked. Further explained here: https://www.informit.com/articles/article.aspx?p=2731930&seqNum=8. The MultipleDispatch class created for the project only accounts for methods with fixed arity, being these methods with a fixed number of arguments. To achieve this extension, we needed to consider variable arity methods, such as public method(Integer... integers), which receives an arbitrary number of objects. This behaviour is implemented in the ist.meic.pava.MultipleDispatchExtended package.
+
+- **Memoization of previous invocations.**
+
+Memoization of previous invocation allows circunventing of the algorithm in case a given invocation was already accounted for in a previous invocation of the algorithm. This is achieved thru a simple singleton cache. This behaviour is implemented in the ist.meic.pava.MultipleDispatchExtended package.
+
+---
+## EXTENSIONS FOR FUTURE CONSIDERATIONS:
+
 - **Dealing not only with the class hierarchy but also the interface hierarchy.**
 
 "Dealing with class hierarchy" means bestMethod() recursively calls itself with the argument's superclass, starting with the most specified class, until it finds the best method. So for instance, if we go further and add a CurvedLine.class that inherits Line.class and we add the relevant methods to print it, and calling invoking them using the dispatch class, the bestMethod() would iterate over the draw method using Shape, then using Line and then using CurvedLine as argument. We need to make this possible for interfaces also. 
@@ -47,28 +59,13 @@ The class `UsingMultipleDispatch.class` as well as the algorithm are described a
 
 Boxing and Unboxing is the conversion of primitive types to their wrapper classes (int to Integer -> Boxing; Integer to int -> Unboxing). Further explained here: https://docs.oracle.com/javase/tutorial/java/data/autoboxing.html. Need further investigation. 
 
-- **Dealing with variable arity methods.** 
+- **Dealing with the passing of null arguments.**
 
-The variable arity of methods relates to the number of arguments a method needs to be invoked. Further explained here: https://www.informit.com/articles/article.aspx?p=2731930&seqNum=8. The MultipleDispatch class created for the project only accounts for methods with fixed arity, being these methods with a fixed number of arguments. To achieve this extension, we need to consider methods with variable arity, or methods with varargs as arguments, such as public method(Object... objs), which receives an arbitrary number of objects.
+- **Dealing with arguments that take primitive arrays as arguments.**
 
----
-## LOG:
+- **Dealing with ambiguous references.**
 
-**29 - 03 - 2021**
-- basic development environment
-- included both basic (for double dispatch testing) and complex (for triple dispatch testing) example domains
-- included sample double dispatch invokation class
+--
+## Testing
 
-**30 - 03 - 2021**
-- multiple dispatch is fully implemented (tested for up to quadruple dispatch - NIGHTMARE!)
-- multiple dispatch algorithm explained in README.md in preparation for presentation
-
----
-## USEFUL LINKS:
-
-
-StackOverflow thread about implementing multiple dispatch in Java:
-- https://stackoverflow.com/questions/11014917/use-invokedynamic-to-implement-multiple-dispatch
-
-Stream terminal and non-terminal methods:
-- http://tutorials.jenkov.com/java-functional-programming/streams.html 
+Feel free to test UsingMultipleDispatch.class and UsingMultipleDispatchExtended.class as you wish. Our MultipleDispatchMain.class already contains some examples of testing for double dispatch `args[0]="double"`, triple dispatch `args[0]="triple"`, quadruple dispatch `args[0]="quadruple"`, variable arity methods `args[0]="variablearity"` and the default test is the triple dispatch test in the project statement. `args[0]="***"`

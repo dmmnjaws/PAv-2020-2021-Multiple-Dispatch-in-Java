@@ -11,6 +11,13 @@ import java.util.stream.Stream;
  */
 public class UsingMultipleDispatchExtended {
 
+    /**
+     * This method is called to use Multiple Dispatch (Extended).
+     * @param receiver is the receiver object of the method to be invoked
+     * @param methodName is the name of the method to be invoked
+     * @param varArgs are the parameter objects to be passed to the method to be invoked
+     * @return the return of the call to the most suitable method
+     */
     public static Object invoke(Object receiver, String methodName, Object... varArgs) {
 
         Class[] parameterTypes = Stream.of(varArgs)
@@ -69,6 +76,14 @@ public class UsingMultipleDispatchExtended {
         }
     }
 
+    /**
+     * This method is the entry point to the Multiple Dispatch algorithm that looks for non-variable arity methods.
+     * @param receiverType is the type of the receiver of the method to be invoked
+     * @param methodName is the name of the method to be invoked
+     * @param parameterTypes are the types of the parameters to be passed to the method to be invoked
+     * @return the most suitable non-variable arity method to be invoked
+     * @throws NoSuchMethodException if no suitable method is found
+     */
     private static Method bestMethod(Class receiverType, String methodName, Class[] parameterTypes) throws NoSuchMethodException {
 
         int orderOfDispatch = parameterTypes.length;
@@ -81,6 +96,16 @@ public class UsingMultipleDispatchExtended {
         return acceptableReceiverMethods[0];
     }
 
+    /**
+     * This method implements part of the Multiple Dispatch algorithm for non-variable arity methods. It has three functions:
+     * - Filter an array of non-variable arity methods, keeping only methods whose parameter number parameterIndex is of type parameterType;
+     * - If it finds none, recursively call itself with the superclass of the parameter type, climb class hierarchy of the parameter, until it reaches Object.class.
+     * @param methods is the array of non-variable arity methods to filter (by now assumed to have only applicable methods)
+     * @param parameterType is the desired parameter type
+     * @param parameterIndex is the desired parameter index
+     * @return filtered array of non-variable arity methods
+     * @throws NoSuchMethodException if array of methods is empty and it reached the end of the class hierarchy
+     */
     private static Method[] filterMethods(Method[] methods, Class parameterType, int parameterIndex) throws NoSuchMethodException {
 
         Method[] filteredMethods = Arrays.stream(methods)
@@ -104,6 +129,14 @@ public class UsingMultipleDispatchExtended {
         }
     }
 
+    /**
+     * This method gets all applicable methods of a receiver's hierarchy, with a given name, and a given number of parameters.
+     * @param receiverType is the desired type of the receiver
+     * @param methodName is the desired method name
+     * @param parameterTypes are the desired parameter types (top of the class hierarchy)
+     * @param orderOfDispatch are the number of parameters
+     * @return an array of applicable methods.
+     */
     private static Method[] getAcceptableReceiverMethods(Class receiverType, String methodName, Class[] parameterTypes, int orderOfDispatch) {
 
         Method[] acceptableReceiverMethods = Stream.of(receiverType.getMethods())
@@ -122,6 +155,11 @@ public class UsingMultipleDispatchExtended {
         return acceptableReceiverMethods;
     }
 
+    /**
+     * This method climbs up the class hierarchy of a given parameter type and gets all of it's superclasses.
+     * @param parameterType the desired parameter type
+     * @return an ArrayList with all superclasses of parameterType.
+     */
     private static ArrayList<Class> getAllSuperclasses(Class parameterType){
 
         ArrayList<Class> allSuperClasses = new ArrayList<>();
@@ -138,6 +176,14 @@ public class UsingMultipleDispatchExtended {
 
     // VARIABLE ARITY
 
+    /**
+     * This method is the entry point to the Multiple Dispatch algorithm that looks for variable arity methods.
+     * @param receiverType is the type of the receiver of the method to be invoked
+     * @param methodName is the name of the method to be invoked
+     * @param parameterTypes are the types of the parameters to be passed to the method to be invoked
+     * @return the most suitable variable arity method to be invoked
+     * @throws NoSuchMethodException if no suitable variable arity method is found
+     */
     private static Method bestVariableArityMethod(Class receiverType, String methodName, Class[] parameterTypes) throws NoSuchMethodException {
 
         int orderOfDispatch = parameterTypes.length;
@@ -177,8 +223,14 @@ public class UsingMultipleDispatchExtended {
     }
 
     /**
-     * Filters out all methods than can't absolutely receive the parameterType in the "parameter slot" number parameterIndex
-     *
+     * Filters variable arity methods, it's behaviour depends on the safeMode boolean:
+     * safeMode == false: filters out all methods whose parameter number parameterIndex isn't in the class hierarchy of parameterType;
+     * safeMode == true: (methods assumed to contain only applicable methods) filters out all methods considered less specific.
+     * @param methods is the array of variable arity methods to filter (if safeMode == true, assumed to contain only applicable methods)
+     * @param parameterType is the desired parameter type
+     * @param parameterIndex is the desired parameter index
+     * @param safeMode is the boolean that tells the method in which mode to run
+     * @return filtered array of methods
      */
     private static Method[] filterVariableArityMethods(Method[] methods, Class parameterType, int parameterIndex, boolean safeMode) {
 
@@ -204,6 +256,12 @@ public class UsingMultipleDispatchExtended {
 
     }
 
+    /**
+     * This method retrieves the minimum common superclass (MCS) from an array of parameter types.
+     * @param parameterTypes is the array of parameter types
+     * @param orderOfDispatch is the number of parameters we want to consider for the MCS
+     * @return the minimum common superclass
+     */
     private static Class getMinimumCommonSuperclass(Class[] parameterTypes, int orderOfDispatch){
 
         ArrayList<Class> allSuperClasses = new ArrayList<>();
@@ -227,6 +285,12 @@ public class UsingMultipleDispatchExtended {
         return Object.class;
     }
 
+    /**
+     * This method gets all var args methods from the receiver hierarchy.
+     * @param receiverType is the desired receiver
+     * @param methodName is the desired method's name
+     * @return an array of methods with all var args methods from the receiver hierarchy
+     */
     private static Method[] getVarArgsReceiverMethods(Class receiverType, String methodName) {
 
         return Stream.of(receiverType.getMethods())
@@ -234,6 +298,15 @@ public class UsingMultipleDispatchExtended {
                 .toArray(Method[]::new);
     }
 
+    /**
+     * This method prepares the special data structures needed to invoke a variable arity method.
+     * @param varArgsMethod the variable arity method to invoke
+     * @param receiver the receiver of the variable arity method
+     * @param varArgs the arguments to be passed to the variable arity method
+     * @return the return of the call to the variable arity method
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
     private static Object invokeVarArgsMethod(Method varArgsMethod, Object receiver, Object... varArgs) throws InvocationTargetException, IllegalAccessException {
 
         int numberOfNonVarParameters = varArgsMethod.getParameterCount() - 1;
@@ -255,6 +328,13 @@ public class UsingMultipleDispatchExtended {
 
     // MEMOIZATION
 
+    /**
+     * This method builds the concatenated string that represents an invocation.
+     * @param receiverType the type of the receiver of the invocation
+     * @param methodName the name of the invoked method
+     * @param parameterTypes the type of the parameters of the arguments requested for invocation
+     * @return the concatenated string
+     */
     private static String invocationStringBuilder(Class receiverType, String methodName, Class[] parameterTypes){
         String invocationString = receiverType.getName() + methodName;
 
@@ -263,14 +343,5 @@ public class UsingMultipleDispatchExtended {
         }
 
         return invocationString;
-    }
-
-    // BOXING AND UNBOXING
-
-    private static void boxingTest(Object... bar) {
-
-        System.err.println("bar instanceof Integer[]:\t" + (bar instanceof Integer[]));
-        System.err.println("bar[0] instanceof Integer:\t" + (bar[0] instanceof Integer));
-        System.err.println("bar.getClass().isArray():\t" + bar.getClass().isArray());
     }
 }

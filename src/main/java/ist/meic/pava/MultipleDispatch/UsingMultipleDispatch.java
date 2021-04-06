@@ -59,7 +59,7 @@ public class UsingMultipleDispatch {
      * @param parameterType is the desired parameter type
      * @param parameterIndex is the desired parameter index
      * @return filtered array of methods
-     * @throws NoSuchMethodException if array of methods is empty and it reached the end of the class hiearchy
+     * @throws NoSuchMethodException if array of methods is empty and it reached the end of the class hierarchy
      */
     private static Method[] filterMethods(Method[] methods, Class parameterType, int parameterIndex) throws NoSuchMethodException {
 
@@ -111,7 +111,7 @@ public class UsingMultipleDispatch {
     }
 
     /**
-     * Climbs up the class hierarchy of a given parameter type and gets all of it's superclasses.
+     * This method climbs up the class hierarchy of a given parameter type and gets all of it's superclasses.
      * @param parameterType the desired parameter type
      * @return an ArrayList with all superclasses of parameterType.
      */
