@@ -57,7 +57,7 @@ Memoization of previous invocation allows circunventing of the algorithm in case
 
 - **Dealing with boxing and unboxing of arguments.**
 
-Boxing and Unboxing is the conversion of primitive types to their wrapper classes (int to Integer -> Boxing; Integer to int -> Unboxing). Further explained here: https://docs.oracle.com/javase/tutorial/java/data/autoboxing.html. Need further investigation. 
+Boxing and Unboxing is the conversion of primitive types to their wrapper classes (int to Integer -> Boxing; Integer to int -> Unboxing). Further explained here: https://docs.oracle.com/javase/tutorial/java/data/autoboxing.html. If a primitive type is passed as argument to a method, it shouldn't be Boxed prior to the algorithm.
 
 - **Dealing with the passing of null arguments.**
 
@@ -65,7 +65,15 @@ Boxing and Unboxing is the conversion of primitive types to their wrapper classe
 
 - **Dealing with ambiguous references.**
 
---
+---
 ## Testing
 
-Feel free to test UsingMultipleDispatch.class and UsingMultipleDispatchExtended.class as you wish. Our MultipleDispatchMain.class already contains some examples of testing for double dispatch `args[0]="double"`, triple dispatch `args[0]="triple"`, quadruple dispatch `args[0]="quadruple"`, variable arity methods `args[0]="variablearity"` and the default test is the triple dispatch test in the project statement. `args[0]="***"`
+Both UsingMultipleDispatch.class and UsingMultipleDispatchExtended.class were tested as much as possible. A TestNG Suite is available. The TestNG suite uses the domain example in the package ist.meic.pava.domainExample.testSuite.
+
+Testing the Memoization Cache with TestNG was unfeasable, since the methods of the cache are package-protected for security reasons, however, such testing is still possible manually:
+
+During most of the development, in order to facilitate corner-case debugging, UsingMultipleDispatch.class and UsingMultipleDispatchExtended.class were manually tested using the MultipleDispatchMain.class. This class already contains some examples of testing:
+   - for tests with double dispatch (`args[0]="double"`), triple dispatch (`args[0]="triple"`) and quadruple dispatch (`args[0]="quadruple"`), it uses the example domain in the package ist.meic.pava.domainExample.quadruple;
+   - for the default test, the triple dispatch example test proposed in the project statement (`args[0]="***"`), it uses the example domain in the package ist.meic.pava.domainExample.statement;
+   - for tests with variable arity methods (`args[0]="variablearity"`), it uses the example domain in the package ist.meic.pava.domainExample.extensions.
+   - other tests can be performed in the else after the switch case in the main. (`args[0].length == 0`).
