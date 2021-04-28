@@ -70,7 +70,7 @@ Boxing and Unboxing is the conversion of primitive types to their wrapper classe
 
 Both UsingMultipleDispatch.class and UsingMultipleDispatchExtended.class were tested as much as possible. A TestNG Suite is available. The TestNG suite uses the domain example in the package ist.meic.pava.domainExample.testSuite.
 
-Testing the Memoization Cache with TestNG was unfeasable, since the methods of the cache are package-protected for security reasons, however, such testing is still possible manually:
+Testing the Memoization Cache with TestNG was unfeasable, since the methods of the cache are package-protected for security reasons, however, such testing is still possible manually: (actually we could have used reflection for this)
 
 During most of the development, in order to facilitate corner-case debugging, UsingMultipleDispatch.class and UsingMultipleDispatchExtended.class were manually tested using the MultipleDispatchMain.class. This class already contains some examples of testing:
    - for tests with double dispatch (`args[0]="double"`), triple dispatch (`args[0]="triple"`) and quadruple dispatch (`args[0]="quadruple"`), it uses the example domain in the package ist.meic.pava.domainExample.quadruple;
