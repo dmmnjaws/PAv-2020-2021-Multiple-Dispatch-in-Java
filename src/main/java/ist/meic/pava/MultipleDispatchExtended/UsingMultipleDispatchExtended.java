@@ -33,7 +33,8 @@ public class UsingMultipleDispatchExtended {
 
         try {
             // if method in cache, return it
-            // if method in cache but null, it's known there's no suitable method in the receiver, throw NoSuchMethodException()
+            // if method in cache but null, it's known there's no suitable method in the receiver, throw NoSuchMethodException
+            // (in absence of method storing null in the cache is redundant in current implementation, it's here for future considerations)
             if(isCached){
                 Method method = multipleDispatchCacheSingleton.getCachedMethod(invocationString);
                 if (method == null){
@@ -53,7 +54,8 @@ public class UsingMultipleDispatchExtended {
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e1) {
             if (e1.getClass().equals(NoSuchMethodException.class)) {
                 try {
-                    // if NoSuchMethodException() came from null method in cache, rethrow exception, there's no suitable method.
+                    // if NoSuchMethodException() came from null method in cache, rethrow exception, there's no suitable method
+                    // (in absence of method storing null in the cache is redundant in current implementation, it's here for future considerations)
                     if(isCached) {
                         throw new NoSuchMethodException();
                     }
@@ -66,7 +68,8 @@ public class UsingMultipleDispatchExtended {
 
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e2) {
 
-                    // if no method found, store in cache with null method (redundant in current implementation, it's here for future considerations)
+                    // if no method found, store in cache with null method
+                    // (in absence of method storing null in the cache is redundant in current implementation, it's here for future considerations)
                     multipleDispatchCacheSingleton.putUncachedMethod(invocationString, null);
                     throw new RuntimeException(e2);
                 }
@@ -100,6 +103,7 @@ public class UsingMultipleDispatchExtended {
      * This method implements part of the Multiple Dispatch algorithm for non-variable arity methods. It has three functions:
      * - Filter an array of non-variable arity methods, keeping only methods whose parameter number parameterIndex is of type parameterType;
      * - If it finds none, recursively call itself with the superclass of the parameter type, climb class hierarchy of the parameter, until it reaches Object.class.
+     * - If array of methods is empty at the end of the class hierarchy of a parameter (Object.class), throw NoSuchMethodException
      * @param methods is the array of non-variable arity methods to filter (by now assumed to have only applicable methods)
      * @param parameterType is the desired parameter type
      * @param parameterIndex is the desired parameter index
@@ -223,7 +227,7 @@ public class UsingMultipleDispatchExtended {
     }
 
     /**
-     * Filters variable arity methods, it's behaviour depends on the safeMode boolean:
+     * This method filters variable arity methods, it's behaviour depends on the safeMode boolean:
      * safeMode == false: filters out all methods whose parameter number parameterIndex isn't in the class hierarchy of parameterType;
      * safeMode == true: (methods assumed to contain only applicable methods) filters out all methods considered less specific.
      * @param methods is the array of variable arity methods to filter (if safeMode == true, assumed to contain only applicable methods)

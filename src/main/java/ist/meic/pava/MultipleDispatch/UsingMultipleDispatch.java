@@ -55,6 +55,7 @@ public class UsingMultipleDispatch {
      * This method implements part of the Multiple Dispatch algorithm. It has three functions:
      * - Filter an array of methods, keeping only methods whose parameter number parameterIndex is of type parameterType;
      * - If it finds none, recursively call itself with the superclass of the parameter type, climb class hierarchy of the parameter, until it reaches Object.class.
+     * - If array of methods is empty at the end of the class hierarchy of a parameter (Object.class), throw NoSuchMethodException
      * @param methods is the array of methods to filter (by now assumed to have only applicable methods)
      * @param parameterType is the desired parameter type
      * @param parameterIndex is the desired parameter index
